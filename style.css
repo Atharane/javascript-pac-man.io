@@ -43,6 +43,11 @@ body {
   background-color: rgb(195, 187, 187);
 }
 
+.ghost{
+  background-color: red;
+  border-width: 2px !important;
+}
+
 #trumpy {
   background-color: red;
 }
@@ -65,7 +70,7 @@ body {
 }
 
 .scared-ghost {
-  background-color: aquamarine !important;
+  background-color: rgb(6, 114, 237) !important;
 }
 
 h3 {

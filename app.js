@@ -148,8 +148,8 @@ function checkForGameOver() {
 }
 
 function checkForWin() {
-  if (score === 274) {
-    //   ghosts.forEach((ghost) => clearInterval(ghost.timerId));
+  if (score >= 274) {
+    ghosts.forEach((ghost) => clearInterval(ghost.timerId));
     document.removeEventListener("keyup", movePacman);
     setTimeout(function () {
       alert("You have WON!");
@@ -177,10 +177,55 @@ ghosts = [
 ];
 
 ghosts.forEach((ghost) => {
-  squares[ghost.currentIndex].id = ghost.className;
+  squares[ghost.currentIndex].id = ghost.id;
   squares[ghost.currentIndex].classList.add("ghost");
 });
 
 function unScareGhosts() {
   ghosts.forEach((ghost) => (ghost.isScared = false));
 }
+
+function moveGhost(ghost) {
+  const directions = [-1, +1, width, -width];
+  let direction = directions[Math.floor(Math.random() * directions.length)];
+
+  ghost.timerId = setInterval(function () {
+    //if the next square the ghost is going to go to does not have a ghost and does not have a wall
+    if (
+      !squares[ghost.currentIndex + direction].classList.contains("ghost") &&
+      !squares[ghost.currentIndex + direction].classList.contains("wall")
+    ) {
+      //remove the ghosts classes
+      squares[ghost.currentIndex].id = "";
+      squares[ghost.currentIndex].classList.remove("ghost", "scared-ghost");
+
+      //move into that space
+      ghost.currentIndex += direction;
+      squares[ghost.currentIndex].classList.add("ghost");
+      squares.id = ghost.id;
+      //else find a new random direction ot go in
+    } else direction = directions[Math.floor(Math.random() * directions.length)];
+
+    //if the ghost is currently scared
+    if (ghost.isScared) {
+      squares[ghost.currentIndex].classList.add("scared-ghost");
+    }
+
+    //if the ghost is currently scared and pacman is on it
+    if (
+      ghost.isScared &&
+      squares[ghost.currentIndex].classList.contains("pac-man")
+    ) {
+      squares[ghost.currentIndex].classList.remove("ghost", "scared-ghost");
+      squares[ghost.currentIndex].id = "";
+      ghost.currentIndex = ghost.startIndex;
+      score += 100;
+      squares[ghost.currentIndex].classList.add("ghost");
+      squares[ghost.currentIndex].id = ghost.id;
+    }
+    checkForGameOver();
+  }, ghost.speed);
+}
+
+//move the Ghosts randomly
+ghosts.forEach((ghost) => moveGhost(ghost));
