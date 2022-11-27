@@ -1,8 +1,7 @@
 const scoreDisplay = document.getElementById("score");
 const width = 28;
-const grid = document.querySelector(".grid");
 let score = 0;
-
+const grid = document.querySelector(".grid");
 const layout = [
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -36,109 +35,152 @@ const layout = [
   0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1,
 ];
-// 0 - pac-dots
-// 1 - wall
-// 2 - ghost-lair
-// 3 - power-pellet
-// 4 - empty
+
+let items_map = {
+  0: "pac-dot",
+  1: "wall",
+  2: "ghost-lair",
+  3: "power-pellet",
+  4: "empty",
+};
 
 const squares = [];
 
-//create your board
+//create board
 function createBoard() {
   for (let i = 0; i < layout.length; i++) {
     const square = document.createElement("div");
     grid.appendChild(square);
+    square.classList.add(items_map[layout[i]]);
     squares.push(square);
-
-    //add layout to the board
-    if (layout[i] === 0) {
-      squares[i].classList.add("pac-dot");
-    } else if (layout[i] === 1) {
-      squares[i].classList.add("wall");
-    } else if (layout[i] === 2) {
-      squares[i].classList.add("ghost-lair");
-    } else if (layout[i] === 3) {
-      squares[i].classList.add("power-pellet");
-    }
   }
 }
 createBoard();
-
 
 //draw pacman onto the board
 let pacmanCurrentIndex = 490;
 squares[pacmanCurrentIndex].classList.add("pac-man");
 
-//get the coordinates of pacman on the grid with X and Y axis
-function getCoordinates(index) {
-  return [index % width, Math.floor(index / width)];
-}
-
-// move pacman
+//move pacman
 function movePacman(e) {
-  // remove pacman
   squares[pacmanCurrentIndex].classList.remove("pac-man");
 
+  function isBlocked(index) {
+    return (
+      squares[index].classList.contains("wall") ||
+      squares[index].classList.contains("ghost-lair")
+    );
+  }
+
   switch (e.keyCode) {
-    // left arrow
     case 37:
-      // pacman at the left exit
-      if (pacmanCurrentIndex === 364) pacmanCurrentIndex = 391;
+      if (squares[pacmanCurrentIndex] === squares[364])
+        pacmanCurrentIndex = 391;
       else if (
         pacmanCurrentIndex % width !== 0 &&
-        !squares[pacmanCurrentIndex - 1].classList.contains("wall") &&
-        !squares[pacmanCurrentIndex - 1].classList.contains("ghost-lair")
+        !isBlocked(pacmanCurrentIndex - 1)
       )
         pacmanCurrentIndex -= 1;
-      break;
 
-    // up arrow
+      break;
     case 38:
       if (
-        pacmanCurrentIndex - width >= 0 &&
-        !squares[pacmanCurrentIndex - width].classList.contains("wall") &&
-        !squares[pacmanCurrentIndex - width].classList.contains("ghost-lair")
+        pacmanCurrentIndex - width > 0 &&
+        !isBlocked(pacmanCurrentIndex - width)
       )
         pacmanCurrentIndex -= width;
       break;
-
-    // right arrow
     case 39:
-      if (pacmanCurrentIndex === 391) pacmanCurrentIndex = 364;
+      if (squares[pacmanCurrentIndex] === squares[391])
+        pacmanCurrentIndex = 364;
       else if (
-        pacmanCurrentIndex % width < width - 1 &&
-        !squares[pacmanCurrentIndex + 1].classList.contains("wall") &&
-        !squares[pacmanCurrentIndex + 1].classList.contains("ghost-lair")
+        (pacmanCurrentIndex % width) + 1 < width &&
+        !isBlocked(pacmanCurrentIndex + 1)
       )
         pacmanCurrentIndex += 1;
-
       break;
-
-    // down arrow
     case 40:
       if (
         pacmanCurrentIndex + width < width * width &&
-        !squares[pacmanCurrentIndex + width].classList.contains("wall") &&
-        !squares[pacmanCurrentIndex + width].classList.contains("ghost-lair")
+        !isBlocked(pacmanCurrentIndex + width)
       )
         pacmanCurrentIndex += width;
       break;
   }
-  // check for pac-dots
-  eatPacdots();
 
   squares[pacmanCurrentIndex].classList.add("pac-man");
+  pacDotEaten();
+  powerPelletEaten();
+  checkForGameOver();
+  checkForWin();
+  scoreDisplay.textContent = score;
 }
 
 document.addEventListener("keyup", movePacman);
 
-// eat pac-dots
-function eatPacdots() {
+function pacDotEaten() {
   if (squares[pacmanCurrentIndex].classList.contains("pac-dot")) {
-    score++;
-    scoreDisplay.textContent = score;
+    score += 1;
     squares[pacmanCurrentIndex].classList.remove("pac-dot");
   }
 }
 
+function powerPelletEaten() {
+  if (squares[pacmanCurrentIndex].classList.contains("power-pellet")) {
+    score += 10;
+    ghosts.forEach((ghost) => (ghost.isScared = true));
+    setTimeout(unScareGhosts, 10000);
+    squares[pacmanCurrentIndex].classList.remove("power-pellet");
+  }
+}
+
+function checkForGameOver() {
+  if (
+    squares[pacmanCurrentIndex].classList.contains("ghost") &&
+    !squares[pacmanCurrentIndex].classList.contains("scared-ghost")
+  ) {
+    ghosts.forEach((ghost) => clearInterval(ghost.timerId));
+    document.removeEventListener("keyup", movePacman);
+    setTimeout(function () {
+      alert("Game Over 👎");
+    }, 500);
+  }
+}
+
+function checkForWin() {
+  if (score === 274) {
+    //   ghosts.forEach((ghost) => clearInterval(ghost.timerId));
+    document.removeEventListener("keyup", movePacman);
+    setTimeout(function () {
+      alert("You have WON!");
+    }, 500);
+  }
+}
+
+class Ghost {
+  constructor(className, startIndex, speed) {
+    this.className = className;
+    this.startIndex = startIndex;
+    this.speed = speed;
+    this.currentIndex = startIndex;
+    this.isScared = false;
+    this.timerId = NaN;
+  }
+}
+
+//all my ghosts
+ghosts = [
+  new Ghost("trumpy", 348, 250),
+  new Ghost("xinping", 351, 300),
+  new Ghost("kim", 376, 400),
+  new Ghost("putin", 379, 500),
+];
+
+ghosts.forEach((ghost) => {
+  squares[ghost.currentIndex].id = ghost.className;
+  squares[ghost.currentIndex].classList.add("ghost");
+});
+
+function unScareGhosts() {
+  ghosts.forEach((ghost) => (ghost.isScared = false));
+}

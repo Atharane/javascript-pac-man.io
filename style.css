@@ -1,38 +1,74 @@
-.grid{
-    display: flex;
-    flex-wrap: wrap;
-    height: 560px;
-    width: 560px;
-    outline: 2px solid #302f2f;
+body {
+  background: #e0e0e0;
+  font-family: SF Pro Display;
 }
-  
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  width: 560px;
+  height: 560px;
+  margin: 20px auto;
+  border-radius: 4px;
+  background: #e0e0e0;
+  box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+}
+
 .grid div {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 2px solid white;
+  box-sizing: border-box;
+  /* box-shadow: 2px 2px 3px #5a5a5a, -2px -2px 3px #ffffff; */
 }
 
 .pac-dot {
-    background-color: #00800063;   
-    border: 5px solid white;
-    box-sizing: border-box;
+  background-color: #70d885;
+  border: 5px solid white !important;
+  box-sizing: border-box;
 }
 
 .wall {
-    background-color: #8d8df6;
+  background-color: powderblue;
 }
 
 .power-pellet {
-    background-color: #156715;
-    border: 2px solid white;
-    border-radius: 50%;
-    box-sizing: border-box;
+  background-color: #e565cc;
+  border-radius: 8px !important;
+  border: 3px solid white !important;
 }
 
-
-.pac-man:after {
-    content: url("./pacman.png");
+.ghost-lair {
+  background-color: rgb(195, 187, 187);
 }
 
-.ghost-lair{
-    background-color: #ff50ad;
+#trumpy {
+  background-color: red;
+}
+
+#putin {
+  background-color: indigo;
+}
+
+#kim {
+  background-color: hotpink;
+}
+
+#xinping {
+  background-color: blue;
+}
+
+.pac-man {
+  background-color: rgb(43, 43, 43);
+  border-radius: 0px !important;
+}
+
+.scared-ghost {
+  background-color: aquamarine !important;
+}
+
+h3 {
+  font-size: 36px;
+  text-align: center;
 }
