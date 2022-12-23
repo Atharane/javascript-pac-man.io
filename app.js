@@ -58,7 +58,7 @@ function createBoard() {
 createBoard();
 
 //draw pacman onto the board
-let pacmanCurrentIndex = 490;
+let pacmanCurrentIndex = 490
 squares[pacmanCurrentIndex].classList.add("pac-man");
 
 //move pacman
@@ -171,8 +171,8 @@ class Ghost {
 //all my ghosts
 ghosts = [
   new Ghost("trumpy", 348, 250),
-  new Ghost("xinping", 351, 300),
-  new Ghost("kim", 376, 400),
+  new Ghost("xinping", 351, 350),
+  new Ghost("kim", 376, 450),
   new Ghost("putin", 379, 500),
 ];
 
